@@ -77,16 +77,7 @@ namespace ConsoleApplication2
             {
                 FigureOutWhatFileToUse(ref fn, ref wasGivenFile);
 
-                MxeParser parser = ReadMxe(fn);
-
-                if (!isTest)
-                {
-                    DoMxeToCsv(writeHex, writeIndex, parser);
-                }
-                else
-                {
-                    DoCsvToMxeSync(fn, isSync, parser);
-                }
+                HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
             }
             else
             {
@@ -121,6 +112,45 @@ namespace ConsoleApplication2
             }
 
             Console.Out.WriteLine("Closing program...");
+        }
+
+        private static void HandleFileOrMethod(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
+        {
+            FileAttributes attr = File.GetAttributes(fn);
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            {
+                HandleDirectory(fn, isSync, isTest, writeHex, writeIndex);
+            }
+            else
+            {
+                HandleFile(fn, isSync, isTest, writeHex, writeIndex);
+            }
+        }
+
+        private static void HandleDirectory(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
+        {
+            DirectoryInfo d = new DirectoryInfo(fn);
+            FileInfo[] files;
+            string search = "*.mxe";
+            files = d.GetFiles(search);
+            foreach (FileInfo fi in files)
+            {
+                HandleFile(fi.FullName, isSync, isTest, writeHex, writeIndex);
+            }
+        }
+
+        private static void HandleFile(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
+        {
+            MxeParser parser = ReadMxe(fn);
+
+            if (!isTest)
+            {
+                DoMxeToCsv(writeHex, writeIndex, parser);
+            }
+            else
+            {
+                DoCsvToMxeSync(fn, isSync, parser);
+            }
         }
 
         private static void FigureOutWhatFileToUse(ref string fn, ref bool wasGivenFile)
