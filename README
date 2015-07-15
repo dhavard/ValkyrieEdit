@@ -4,4 +4,6 @@ It parses the *.mxe files and extracts data in a CSV format, and then optionally
 
 Run the application with "-help" argument for more information.
 
+Also, the solution files contain a 'config.txt' which is not automatically deployed (I have an older version of VS) but it is a good starting point to use to place in the same directory as your ValkyrieEdit.exe file.
+
 !!!Note that while the program does allow editing of string values, it does not allow those values to differ in length from the original value!!! (At least not yet).
