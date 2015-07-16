@@ -14,7 +14,7 @@ VlMxForceInfo,pDescription,pName,,i,i,i,i,i,,,,
 VlMxGalliaRareWeaponCandidateInfo,,,,,,hWeaponId8Pair,hWeaponId8Pair2,
 VlMxGeneralCharInfo,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 VlMxGeneralCharParamSetInfo,,,,,,,,,,,,,,,,,,,,,,,,
-VlMxJobInfo,,iClassType,pName1,pEliteName,,,fGrassDetect,,iLevel1,iLevel2,iLevel3,iLevel4,iLevel5,iLevel6,iLevel7,iLevel8,iLevel9,iLevel10,iLevel11,iLevel12,iLevel13,iLevel14,iLevel15,iLevel16,iLevel17,iLevel18,iLevel19,iLevel20,,,fInterceptAngle,f,fAssistAngle,f,fBaseHp,fBaseAccuracy,fBaseEvade,fBaseAp,fBaseDefense,fEliteHp,fEliteAccuracy,fEliteEvade,fEliteAp,fEliteDefense,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+VlMxJobInfo,i,iClassType,pName1,pEliteName,,,fGrassDetect,,iLevel1,iLevel2,iLevel3,iLevel4,iLevel5,iLevel6,iLevel7,iLevel8,iLevel9,iLevel10,iLevel11,iLevel12,iLevel13,iLevel14,iLevel15,iLevel16,iLevel17,iLevel18,iLevel19,iLevel20,,,fInterceptAngle,f,fAssistAngle,f,fBaseHp,fBaseAccuracy,fBaseEvade,fBaseAp,fBaseDefense,fEliteHp,fEliteAccuracy,fEliteEvade,fEliteAp,fEliteDefense,i,iWeaponType,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i
 VlMxMapObjectCommonInfo,,,,
 VlMxMapObjectInfo,,,,,,,,,,,,
 VlMxNewsPaperInfo,,,,,,,,
