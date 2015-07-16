@@ -74,8 +74,9 @@ namespace ConsoleApplication2.Data
             }
         }
 
-        public void ReadCsvLineData(List<string> headers, List<string> data)
+        public bool ReadCsvLineData(List<string> headers, List<string> data)
         {
+            bool ret = false;
             if (data.Count < _entries.Count)
             {
                 Console.Out.WriteLine("Insufficient data count. Skipping record.");                
@@ -83,8 +84,10 @@ namespace ConsoleApplication2.Data
 
             for (int i = 0; i < data.Count && i < _entries.Count; i++)
             {
-                _entries[i].SetValue(headers[i], data[i]);
+                ret = _entries[i].SetValue(headers[i], data[i]) || ret;
             }
+
+            return ret;
         }
     }
 }

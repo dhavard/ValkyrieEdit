@@ -136,9 +136,9 @@ namespace ConsoleApplication2.Data
             return (int)Math.Ceiling(GetTypeCode() / 16.0) * 4;
         }
 
-        public void ReadCsvLineData(List<string> headers, List<string> data)
+        public bool ReadCsvLineData(List<string> headers, List<string> data)
         {
-            _block.ReadCsvLineData(headers, data);
+            return _block.ReadCsvLineData(headers, data);
         }
     }
 }

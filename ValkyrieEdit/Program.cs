@@ -216,12 +216,23 @@ namespace ConsoleApplication2
 
         private static void DoCsvToMxeSync(string fn, bool isSync, MxeParser parser)
         {
-            //read in CSV and write to MXE
+            //read in CSV and write to MXE if we found a change
             Console.Out.WriteLine("Reading in CSV data...");
-            parser.ReadCsvs();
-            if (isSync)
+            if (parser.ReadCsvs() && isSync)
             {
-                Console.Out.WriteLine("Writing out MXE data to [" + fn + "]...");
+                Console.Out.WriteLine("Backup MXE file and then Writing out MXE data to [" + fn + "]...");
+                
+                // back up the mxe file with a .bak file
+                int fileCount = -1;
+                string backup = fn + ".bak";
+                do
+                {
+                    fileCount++;
+                }
+                while (File.Exists(backup + (fileCount > 0 ? fileCount.ToString() : String.Empty)));
+
+                File.Copy(fn, backup + (fileCount > 0 ? fileCount.ToString() : String.Empty));
+                // write out the changed data
                 parser.Write();
             }
         }

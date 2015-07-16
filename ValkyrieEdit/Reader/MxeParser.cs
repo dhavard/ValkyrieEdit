@@ -219,10 +219,11 @@ namespace ConsoleApplication2.Reader
             }
         }
 
-        public void ReadCsvs()
+        public bool ReadCsvs()
         {
             DirectoryInfo d = new DirectoryInfo(@".\" + _basedir);
             FileInfo[] files;
+            bool foundAChange = false;
             string search = "*" + CSV_ENDING;
             if (MxeWord.Hex)
             {
@@ -231,11 +232,13 @@ namespace ConsoleApplication2.Reader
             files = d.GetFiles(search);
             foreach (FileInfo fi in files)
             {
-                ReadCsvFile(fi);
+                foundAChange = ReadCsvFile(fi) || foundAChange;
             }
+
+            return foundAChange;
         }
 
-        private void ReadCsvFile(FileInfo fi)
+        private bool ReadCsvFile(FileInfo fi)
         {
             Console.Out.WriteLine("Reading in CSV data from [" + fi.FullName + "]...");
             int end = fi.Name.LastIndexOf('-');
@@ -243,10 +246,11 @@ namespace ConsoleApplication2.Reader
             string type = fi.Name.Remove(end).Substring(start + 1);
             string countStr = fi.Name.Remove(start);
             int count = -1;
+            bool foundAChange = false;
             if (!Int32.TryParse(countStr, out count))
             {
                 Console.Out.WriteLine(String.Format(CSV_OPEN_NAME_ERROR, fi.FullName));
-                return;
+                return false;
             }
 
             try
@@ -295,7 +299,7 @@ namespace ConsoleApplication2.Reader
                                 Console.Out.WriteLine(String.Format(CSV_MATCH_COUNT_ERROR, fi.FullName, lineNum, headers.Count, data.Count));
                                 continue;
                             }
-                            index.ReadCsvLineData(headers, data);
+                            foundAChange = index.ReadCsvLineData(headers, data) || foundAChange;
                         }
                     }
 
@@ -306,6 +310,8 @@ namespace ConsoleApplication2.Reader
             {
                 Console.Out.WriteLine(exc.ToString());
             }
+            
+            return foundAChange;
         }
 
         private static List<string> GetCsvHeaders(string line)

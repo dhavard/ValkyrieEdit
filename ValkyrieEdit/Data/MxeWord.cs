@@ -105,7 +105,7 @@ namespace ConsoleApplication2.Data
             }
         }
 
-        public void SetValue(string header, string val)
+        public bool SetValue(string header, string val)
         {
             if (!header.Equals(_header))
             {
@@ -150,8 +150,11 @@ namespace ConsoleApplication2.Data
                 if (!original.Equals(newval))
                 {
                     Console.Out.WriteLine(String.Format(@"Changing [{0}] original value [{1}] to new value [{2}]", _header, original, newval));
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public object GetValue()
