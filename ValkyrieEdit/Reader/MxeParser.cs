@@ -46,7 +46,7 @@ namespace ConsoleApplication2.Reader
         {
             try
             {
-                using (var stream = new FileStream(_filename, FileMode.Open, FileAccess.Read))
+                using (var stream = new FileStream(_filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     ReadTableMeta(stream);
 
@@ -96,7 +96,7 @@ namespace ConsoleApplication2.Reader
         {
             try
             {
-                using (var stream = new FileStream(_filename, FileMode.Open, FileAccess.Write))
+                using (var stream = new FileStream(_filename, FileMode.Open, FileAccess.Write, FileShare.Read))
                 {
                     foreach (MxeIndexEntry mie in _indexes.Values)
                     {

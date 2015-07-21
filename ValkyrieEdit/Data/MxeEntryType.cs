@@ -8,7 +8,11 @@ namespace ConsoleApplication2.Data
 {
     public class MxeEntryType
     {
+        private const string VIM_PART = @"VlMx";
+        private const string ADDITIONAL_PART = @"Additional";
+        private const string A_120_PART = @"_120";
         private const string ERROR_FORMAT = @"Failed to determine MxeEntryType due to non-matching lengths for type [{0}]. CHECK YOUR config.txt FILE. Expected [{1}] but found [{2}] (both numbers rounded to the nearest count 16 bytes since that is how they are addressed).";
+        private const string ADDITIONAL_FORMAT = @"Found missing config entry for config type [{0}]. CHECK YOUR config.txt FILE. Sample config entry as follows [{1}].";
         private const string CONFIG_FILE = @".\config.txt";
         
         private static Dictionary<string, MxeEntryType> _knownTypes;
@@ -141,26 +145,68 @@ namespace ConsoleApplication2.Data
             return _type.Equals(met.Type1);
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(Type1);
+
+            foreach (string h in Headers)
+            {
+                sb.Append(',');
+                sb.Append(h);
+            }
+
+            return sb.ToString();
+        }
+
         public static MxeEntryType GetEntryType( MxeIndexEntry mie )
         {
             int length = BitConverter.ToInt32(mie.TypeCode.GetBytes(),0);
             string name = mie.GetVmTitle();
+            MxeEntryType ret = _other;
 
             if (_knownTypes.ContainsKey(name))
             {
-                MxeEntryType met = _knownTypes[name];
-                int indexLength = mie.GetExpectedByteWords();
-                if (met.Length == indexLength)
+                ret = CheckTypeLength(mie, name, ret);
+            }
+            else if(name.StartsWith(VIM_PART))
+            {
+                string oldName = StripAdditionalName(name);
+                if (_knownTypes.ContainsKey(oldName))
                 {
-                    return met;
-                }
-                else
-                {
-                    Console.Out.WriteLine(String.Format(ERROR_FORMAT, name, met.Length, indexLength));
+                    MxeEntryType newType = new MxeEntryType(name, mie.GetExpectedByteWords());
+                    newType.Headers = _knownTypes[oldName].Headers.ToArray().ToList(); //cheater clone?
+                    while (newType.Headers.Count < newType.Length)
+                    {
+                        newType.Headers.Add(String.Empty);
+                    }
+
+                    Console.Out.WriteLine(String.Format(ADDITIONAL_FORMAT, newType.Type1, newType.ToString()));
+                    _knownTypes.Add(newType.Type1, newType);
+                    ret = newType;
                 }
             }
 
-            return _other;
+            return ret;
+        }
+
+        private static string StripAdditionalName(string name)
+        {
+            return name.Replace(ADDITIONAL_PART, String.Empty).Replace(A_120_PART, String.Empty);
+        }
+
+        private static MxeEntryType CheckTypeLength(MxeIndexEntry mie, string name, MxeEntryType ret)
+        {
+            MxeEntryType met = _knownTypes[name];
+            int indexLength = mie.GetExpectedByteWords();
+            if (met.Length == indexLength)
+            {
+                ret = met;
+            }
+            else
+            {
+                Console.Out.WriteLine(String.Format(ERROR_FORMAT, name, met.Length, indexLength));
+            }
+            return ret;
         }
     }
 }
