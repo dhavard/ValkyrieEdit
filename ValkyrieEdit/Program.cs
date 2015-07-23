@@ -84,6 +84,10 @@ namespace ConsoleApplication2
                 {
                     ConfigDiscovery.PrintDiscoveries();
                 }
+                else
+                {
+                    ConfigDiscovery.DeleteDiscoveryFile();
+                }
             }
             else
             {
