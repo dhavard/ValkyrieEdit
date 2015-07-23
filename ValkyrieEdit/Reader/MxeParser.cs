@@ -92,10 +92,24 @@ namespace ConsoleApplication2.Reader
                 current += _tableStart.GetLength() * 4;
             }
 
-            DiscoverTypes(stream);
+            Dictionary<string, MxeEntryType> dts = DiscoverTypes(stream);
+
+            RefreshOtherTypesToDiscoveredType(dts);
         }
 
-        private void DiscoverTypes(FileStream stream)
+        private void RefreshOtherTypesToDiscoveredType(Dictionary<string, MxeEntryType> dts)
+        {
+            foreach (MxeIndexEntry mie in _indexes.Values)
+            {
+                string key = mie.GetVmTitle();
+                if (mie.Block.Type == MxeEntryType.Other && dts.ContainsKey(key))
+                {
+                    mie.Block.Type = dts[key];
+                }
+            }
+        }
+
+        private Dictionary<string, MxeEntryType> DiscoverTypes(FileStream stream)
         {
             Dictionary<string, List<string>> discoveredTypes = new Dictionary<string, List<string>>();
             foreach (MxeIndexEntry mie in _indexes.Values)
@@ -115,11 +129,16 @@ namespace ConsoleApplication2.Reader
                 }
             }
 
+            Dictionary<string, MxeEntryType> dts = new Dictionary<string, MxeEntryType>();
             foreach (KeyValuePair<string, List<string>> entry in discoveredTypes)
             {
                 MxeEntryType newType = new MxeEntryType(entry.Key, entry.Value);
+                MxeEntryType.KnownTypes.Add(entry.Key, newType);
+                dts.Add(entry.Key, newType);
                 ConfigDiscovery.AddNewMxeType(newType);
             }
+
+            return dts;
         }
 
         private List<string> MergeTypeLists(List<string> old, List<string> news)
