@@ -161,6 +161,21 @@ namespace ConsoleApplication2.Data
 
                 string newval = GetValueAsHex();
 
+                if (!(String.IsNullOrEmpty(header) || header.Length < 1))
+                {
+                    if ((int)header[0] == (int)ValueType.Float)
+                    {
+                        string shortOrig = original.Substring(0, 5);
+                        string shortNew = newval.Substring(0, 5);
+
+                        if (shortOrig.Equals(shortNew))
+                        {
+                            SetValueAsHex(original);
+                            newval = original;
+                        }
+                    }
+                }
+                
                 if (!original.Equals(newval))
                 {
                     Console.Out.WriteLine(String.Format(@"Changing [{0}] original value [{1}] to new value [{2}]", _header, original, newval));
@@ -327,7 +342,7 @@ namespace ConsoleApplication2.Data
         public string SuggestType(FileStream stream)
         {
             int i = GetValueAsInt();
-            if (i < 0xFFFFF)
+            if (i < 0xFFFFF && i > -0xFFFF)
             {
                 if (stream != null && i < stream.Length && i > 0x1FF)
                 {
