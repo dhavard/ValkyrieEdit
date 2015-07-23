@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using ValkyrieEdit.Discover;
 
 namespace ConsoleApplication2.Data
 {
@@ -12,7 +13,6 @@ namespace ConsoleApplication2.Data
         private const string ADDITIONAL_PART = @"Additional";
         private const string A_120_PART = @"_120";
         private const string ERROR_FORMAT = @"Failed to determine MxeEntryType due to non-matching lengths for type [{0}]. CHECK YOUR config.txt FILE. Expected [{1}] but found [{2}] (both numbers rounded to the nearest count 16 bytes since that is how they are addressed).";
-        private const string ADDITIONAL_FORMAT = @"Found missing config entry for config type [{0}]. CHECK YOUR config.txt FILE. Sample config entry as follows [{1}].";
         private const string CONFIG_FILE = @".\config.txt";
         
         private static Dictionary<string, MxeEntryType> _knownTypes;
@@ -180,7 +180,7 @@ namespace ConsoleApplication2.Data
                         newType.Headers.Add(String.Empty);
                     }
 
-                    Console.Out.WriteLine(String.Format(ADDITIONAL_FORMAT, newType.Type1, newType.ToString()));
+                    ConfigDiscovery.AddNewMxeType(newType);
                     _knownTypes.Add(newType.Type1, newType);
                     ret = newType;
                 }

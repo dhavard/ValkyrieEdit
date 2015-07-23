@@ -5,6 +5,7 @@ using System.Text;
 using ConsoleApplication2.Reader;
 using ConsoleApplication2.Data;
 using System.IO;
+using ValkyrieEdit.Discover;
 
 namespace ConsoleApplication2
 {
@@ -78,6 +79,11 @@ namespace ConsoleApplication2
                 FigureOutWhatFileToUse(ref fn, ref wasGivenFile);
 
                 HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
+
+                if (ConfigDiscovery.HasDiscoveries())
+                {
+                    ConfigDiscovery.PrintDiscoveries();
+                }
             }
             else
             {

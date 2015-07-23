@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using ConsoleApplication2.Reader;
+using System.Text.RegularExpressions;
 
 namespace ConsoleApplication2.Data
 {
@@ -76,33 +77,46 @@ namespace ConsoleApplication2.Data
             base.ReadFromFile(str);
             if (ValueType.Pointer.Equals(_valueType))
             {
-                int p = MxeParser.GetRealAddress(GetValueAsInt());
+                ReadPString(str, false);
+            }
+        }
 
-                if (p >= str.Length)
+        private string ReadPString(FileStream str, bool isTest)
+        {
+            int p = MxeParser.GetRealAddress(GetValueAsInt());
+            string ret = String.Empty;
+
+            if (p >= str.Length)
+            {
+                if (!isTest)
                 {
                     Console.Out.WriteLine(String.Format(@"Pointer header [{0}] contains overly large pointer [{1}] exceeding source file size. Are you sure this is a pointer? CHECK YOU config.txt FILE! Skipping value.", _header, GetValueAsHex()));
                 }
-                else if (p > 0)
+            }
+            else if (p > 0)
+            {
+                List<byte> pbytes = new List<byte>();
+                str.Seek(p, SeekOrigin.Begin);
+                byte b = (byte)str.ReadByte();
+                if (b != 0x0)
                 {
-                    List<byte> pbytes = new List<byte>();
-                    str.Seek(p, SeekOrigin.Begin);
-                    byte b = (byte)str.ReadByte();
-                    if (b == 0x0)
+                    int pos = p;
+                    while (b != 0x0 && pos < str.Length)
                     {
-                        _pstring = "";
+                        pbytes.Add(b);
+                        b = (byte)str.ReadByte();
+                        pos++;
                     }
-                    else
-                    {
-                        while (b != 0x0)
-                        {
-                            pbytes.Add(b);
-                            b = (byte)str.ReadByte();
-                        }
-                        _pstring = Encoding.UTF8.GetString(pbytes.ToArray(), 0, pbytes.Count); ;
-                    }
-                    _pstringbytes = new ByteString(p, _pstring.Length);
+                    ret = Encoding.UTF8.GetString(pbytes.ToArray(), 0, pbytes.Count);
                 }
             }
+
+            if (!isTest)
+            {
+                _pstring = ret;
+                _pstringbytes = new ByteString(p, _pstring.Length);
+            }
+            return ret;
         }
 
         public bool SetValue(string header, string val)
@@ -308,6 +322,33 @@ namespace ConsoleApplication2.Data
             {
                 _pstringbytes.WriteToFile(str);
             }
+        }
+
+        public string SuggestType(FileStream stream)
+        {
+            int i = GetValueAsInt();
+            if (i < 0xFFFFF)
+            {
+                if (stream != null && i < stream.Length && i > 0x1FF)
+                {
+                    string str = ReadPString(stream, true);
+                    Regex r = new Regex(@"[^\w\s]");
+                    if (!r.IsMatch(str)) 
+                    {
+                        return "p";
+                    }
+                }
+
+                return "i";
+            }
+
+            string hex = GetValueAsHex();
+            if (hex.EndsWith("000"))
+            {
+                return "f";
+            }
+
+            return "h";
         }
     }
 }

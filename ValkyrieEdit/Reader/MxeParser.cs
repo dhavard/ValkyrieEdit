@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ConsoleApplication2.Data;
 using System.IO;
+using ValkyrieEdit.Discover;
 
 namespace ConsoleApplication2.Reader
 {
@@ -90,6 +91,69 @@ namespace ConsoleApplication2.Reader
 
                 current += _tableStart.GetLength() * 4;
             }
+
+            DiscoverTypes(stream);
+        }
+
+        private void DiscoverTypes(FileStream stream)
+        {
+            Dictionary<string, List<string>> discoveredTypes = new Dictionary<string, List<string>>();
+            foreach (MxeIndexEntry mie in _indexes.Values)
+            {
+                if (mie.Block.Type == MxeEntryType.Other)
+                {
+                    string key = mie.GetVmTitle();
+                    List<string> currTypes = mie.SuggestTypes(stream);
+                    if (!discoveredTypes.ContainsKey(key))
+                    {
+                        discoveredTypes[key] = currTypes;
+                    }
+                    else
+                    {
+                        MergeTypeLists(discoveredTypes[key], currTypes);
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, List<string>> entry in discoveredTypes)
+            {
+                MxeEntryType newType = new MxeEntryType(entry.Key, entry.Value);
+                ConfigDiscovery.AddNewMxeType(newType);
+            }
+        }
+
+        private List<string> MergeTypeLists(List<string> old, List<string> news)
+        {
+            if (old == null)
+            {
+                return news;
+            }
+
+            for (int i = 0; i < news.Count; i++)
+            {
+                if (i >= old.Count)
+                {
+                    old.Add(news[i]);
+                }
+                else if (old[i] == news[i])
+                {
+                    continue;
+                }
+                else if (news[i] == "h" || news[i] == "l" || news[i] == "b")
+                {
+                    old[i] = "h";
+                }
+                else if ((old[i] == "i" && news[i] == "f") || (old[i] == "f" && news[i] == "i"))
+                {
+                    old[i] = "f";
+                }
+                else if ((old[i] == "i" && news[i] == "p") || (old[i] == "p" && news[i] == "i"))
+                {
+                    old[i] = "i";
+                }
+            }
+
+            return old;
         }
 
         public void Write()

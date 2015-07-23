@@ -140,5 +140,10 @@ namespace ConsoleApplication2.Data
         {
             return _block.ReadCsvLineData(headers, data);
         }
+
+        public List<string> SuggestTypes(FileStream stream)
+        {
+            return _block.SuggestTypes(stream);
+        }
     }
 }

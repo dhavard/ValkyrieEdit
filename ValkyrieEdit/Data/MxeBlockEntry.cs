@@ -89,5 +89,17 @@ namespace ConsoleApplication2.Data
 
             return ret;
         }
+
+        public List<string> SuggestTypes(FileStream stream)
+        {
+            List<string> types = new List<string>();
+
+            foreach (MxeWord word in _entries)
+            {
+                types.Add(word.SuggestType(stream));
+            }
+
+            return types;
+        }
     }
 }
