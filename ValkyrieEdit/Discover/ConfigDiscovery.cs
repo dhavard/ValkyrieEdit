@@ -50,5 +50,14 @@ namespace ValkyrieEdit.Discover
                 Console.Out.WriteLine(exc.ToString());
             }
         }
+
+        public static void DeleteDiscoveryFile()
+        {
+            FileInfo fi = new FileInfo(DISCOVERY_FILE);
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+        }
     }
 }
