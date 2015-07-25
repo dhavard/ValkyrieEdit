@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.txt" />
+    <Content Include="help.txt" />
   </ItemGroup>
   <ItemGroup>
     <PublishFile Include="config.txt">

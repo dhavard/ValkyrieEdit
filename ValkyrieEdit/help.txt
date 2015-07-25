@@ -1,3 +1,5 @@
+Version 0.2
+
 This program is designed to read and edit *.mxe files used by the PC version of Valkyrie Chronicles. Requires DotNetFramework 3.5 or higher.
 Example call:
    > ValkyrieEdit.exe [Path\To\File\game_info.mxe] [-HILQRST]
