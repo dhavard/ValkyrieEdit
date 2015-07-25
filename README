@@ -1,8 +1,15 @@
-This is a C# program designed to aid modding of Valkyrie Chronicles PC / Steam version.
+ValkyrieEdit v0.1
+
+THIS IS A PRELIMINARY VERSION THAT IS ACTIVELY BEING WORKED ON. Please report any issues @ https://github.com/dhavard/ValkyrieEdit/issues
+
+This is a C# program designed to aid modding of Valkyrie Chronicles PC / Steam version. 
 
 It parses the *.mxe files and extracts data in a CSV format, and then optionally, writes it back from the CSV to the *.mxe file... to allow more "sane" editing that sitting in a Hex editor for days.
 
-Run the application with "-help" argument for more information.
+If you choose to use the pre-built files in the "./Binaries" directory, note that you may not be getting the latest version of the application. Building it yourself will pretty much always be better until final release candidates are compiled.
+
+Run the application with "-help" argument for more information, it should generate output to the console window describing how to use it.
+If the -help argument does not work for some reason, you can read a copy of this text in the "./ValkyrieEdit/help.txt" file.
 
 Also, the solution files contain a 'config.txt' which is not automatically deployed (I have an older version of VS) but it is a good starting point to use to place in the same directory as your ValkyrieEdit.exe file.
 
