@@ -79,7 +79,7 @@ namespace ConsoleApplication2
             {
                 FigureOutWhatFileToUse(ref fn, ref wasGivenFile);
 
-                MxeParser.HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
+                Parser.HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
 
                 if (ConfigDiscovery.HasDiscoveries())
                 {
@@ -89,8 +89,6 @@ namespace ConsoleApplication2
                 {
                     ConfigDiscovery.DeleteDiscoveryFile();
                 }
-
-                MtpParser.HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
             }
             else
             {

@@ -51,7 +51,7 @@ namespace ValkyrieEdit.Data.Mtp
         {
             //int withEndLen = Sentence.Length + 1;
             //int needsToAdd = 4 - (withEndLen % 4 );
-            if (previous != null)
+            if (previous != null && previous.Sentence != null)
             {
                 _size.Position = previous.Size.Position + _size.Length + previous.Sentence.Length;
                 _sentence.Position = _size.Position + _size.Length;
@@ -68,12 +68,19 @@ namespace ValkyrieEdit.Data.Mtp
             _sentence.SetBytes(bytes.ToArray());
 
             _size.WriteToFile(stream);
-            _sentence.WriteToFile(stream);
+            if (_sentence != null)
+            {
+                _sentence.WriteToFile(stream);
+            }
         }
 
         public void WriteCsv(StreamWriter stream)
         {
-            stream.Write(Encoding.UTF8.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length));
+            if (_sentence != null)
+            {
+                string sent = Encoding.UTF8.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length);
+                stream.Write(sent.Replace("\n", "\\n").Replace("\r", "\\r").Replace(",", "~"));
+            }
         }
 
         public static void WriteCsvHeaders(StreamWriter stream)

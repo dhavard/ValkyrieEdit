@@ -84,9 +84,9 @@ namespace ValkyrieEdit.Data.Mtp
             _parser = parser;
             _previous = prev;
 
-            _id = new MxeWord(position, "iId");
-            _actor = new MxeWord(position + 0x4, "iActor");
-            _start = new MxeWord(position + 0x8, "iStart");
+            _id = new MxeWord(position, "hId");
+            _actor = new MxeWord(position + 0x4, "hActor");
+            _start = new MxeWord(position + 0x8, "hStart");
             _unknown = new MxeWord(position + 0xC, "hUnknown");
         }
         
@@ -143,7 +143,7 @@ namespace ValkyrieEdit.Data.Mtp
 
         public static void WriteCsvHeaders(StreamWriter stream)
         {
-            stream.Write("iId,iActor,iStart,hUnknown,");
+            stream.Write("hId,hActor,hStart,hUnknown,");
             MtpTimingEntry.WriteCsvHeaders(stream);            
             MtpSentence.WriteCsvHeaders(stream);
         }

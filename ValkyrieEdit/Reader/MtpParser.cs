@@ -68,18 +68,25 @@ namespace ValkyrieEdit.Reader
 
             _indexesStart = pos;
 
+            List<MtpIndexEntry> entries = new List<MtpIndexEntry>();
             MtpIndexEntry prevE = null;
-            for (int i = 0; i < sc && i < 9; i++)
+            for (int i = 0; i < sc; i++)
             {
                 MtpIndexEntry e = new MtpIndexEntry(pos, this, prevE);
-                e.ReadEntry(stream);
-                _indexes.Add(e.Id.GetValueAsRawInt(), e);
+                entries.Add(e);
 
                 prevE = e;
                 pos += _sentenceCount.Length * 4;
             }
 
             _sentencesStart = pos;
+
+            //can't read or setup all this stuff until after _sentencesStart is set.
+            foreach (MtpIndexEntry e in entries)
+            {
+                e.ReadEntry(stream); 
+                _indexes.Add(e.Id.GetValueAsRawInt(), e);
+            }
         }
 
         public override bool ReadCsvs()
