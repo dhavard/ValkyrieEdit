@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ConsoleApplication2.Data;
+using ConsoleApplication2.Data.Mxe;
 using System.IO;
 
 namespace ValkyrieEdit.Discover

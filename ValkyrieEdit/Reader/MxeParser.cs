@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ConsoleApplication2.Data;
+using ConsoleApplication2.Data.Mxe;
 using System.IO;
 using ValkyrieEdit.Discover;
+using ValkyrieEdit.Reader;
 
 namespace ConsoleApplication2.Reader
 {
 
-    public class MxeParser
+    public class MxeParser : Parser
     {
         private const string CSV_OPEN_NAME_ERROR = @"Csv file [{0}] was not named in the expect manner (e.g. '4-VlMxMapObjectCommonInfo-Data.csv'). Skipping file.";
         private const string CSV_MATCH_ERROR = @"Mxe Index referenced in file [{0}] of value [{1}] could not be found in source. Skipping record.";
@@ -23,17 +24,13 @@ namespace ConsoleApplication2.Reader
         private const string CSV_INDEX_ENDING = @"-Index.csv";
         private const string CSV_HEX_ENDING = @"-Hex.csv";
 
-        private const int _headerSize = 0x20;
-        private const int _tableCountAddr = 0x84;
-        private const int _tableStartAddr = 0x88;
+        protected const int _tableCountAddr = 0x84;
+        protected const int _tableStartAddr = 0x88;
 
-        private string _filename;
-        private string _basedir;
+        protected ByteWord _tableCount;
+        protected ByteWord _tableStart;
 
-        private ByteWord _tableCount;
-        private ByteWord _tableStart;
-
-        private Dictionary<int, MxeIndexEntry> _indexes;
+        protected Dictionary<int, MxeIndexEntry> _indexes;
 
         public MxeParser(String filename)
         {
@@ -43,34 +40,7 @@ namespace ConsoleApplication2.Reader
             Directory.CreateDirectory(_basedir);
         }
 
-        public void Read()
-        {
-            try
-            {
-                using (var stream = new FileStream(_filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                {
-                    ReadTableMeta(stream);
-
-                    stream.Close();
-                }
-            }
-            catch (Exception exc)
-            {
-                Console.Out.WriteLine(exc.ToString());
-            }
-        }
-
-        public static int GetRealAddress(ByteWord addr)
-        {
-            return GetRealAddress(BitConverter.ToInt32(addr.GetBytes(), 0));
-        }
-
-        public static int GetRealAddress(int addr)
-        {
-            return addr + _headerSize;
-        }
-
-        private void ReadTableMeta(FileStream stream)
+        protected override void ReadTableMeta(FileStream stream)
         {
             _tableCount = new ByteWord(_tableCountAddr);
             _tableStart = new ByteWord(_tableStartAddr);
@@ -89,7 +59,7 @@ namespace ConsoleApplication2.Reader
                 e.ReadEntry(stream);
                 _indexes.Add(e.GetIndex(), e);
 
-                current += _tableStart.GetLength() * 4;
+                current += _tableStart.Length * 4;
             }
 
             Dictionary<string, MxeEntryType> dts = DiscoverTypes(stream);
@@ -175,7 +145,7 @@ namespace ConsoleApplication2.Reader
             return old;
         }
 
-        public void Write()
+        public override void Write()
         {
             try
             {
@@ -196,13 +166,13 @@ namespace ConsoleApplication2.Reader
             
         }
 
-        public void WriteIndexes()
+        public override void WriteIndexes()
         {
             WriteCsvFile(_indexes.Values.ToList(), String.Format(ALL_INDEX_FORMAT, _basedir), true);
             WriteFilesByGroup(CSV_FILE_FORMAT, CSV_INDEX_ENDING, true);
         }
 
-        public void WriteCsv()
+        public override void WriteCsv()
         {
             if (MxeWord.Hex)
             {
@@ -214,7 +184,7 @@ namespace ConsoleApplication2.Reader
             }
         }
 
-        private void WriteFilesByGroup(string fnFormat, string fext, bool isIndex)
+        protected void WriteFilesByGroup(string fnFormat, string fext, bool isIndex)
         {
             foreach (IGrouping<string, MxeIndexEntry> group in _indexes.Values.GroupBy(x => x.GetVmTitle()))
             {
@@ -233,7 +203,7 @@ namespace ConsoleApplication2.Reader
             }
         }
 
-        private void WriteCsvFile(List<MxeIndexEntry> grouplist, string fn, bool isIndex)
+        protected void WriteCsvFile(List<MxeIndexEntry> grouplist, string fn, bool isIndex)
         {
             String msg = isIndex ? "Writing index file " : "Writing data file ";
             Console.Out.WriteLine(msg + fn);
@@ -259,7 +229,7 @@ namespace ConsoleApplication2.Reader
             }
         }
 
-        private void WriteCsvItems( StreamWriter stream, List<MxeIndexEntry> group )
+        protected void WriteCsvItems(StreamWriter stream, List<MxeIndexEntry> group)
         {
             stream.Write("iMxeIndex,iMxeVm,");
             foreach (string h in group[0].Block.Type.Headers)
@@ -289,7 +259,7 @@ namespace ConsoleApplication2.Reader
             }
         }
 
-        private void WriteCsvIndexes(StreamWriter stream, List<MxeIndexEntry> group)
+        protected void WriteCsvIndexes(StreamWriter stream, List<MxeIndexEntry> group)
         {
             stream.Write("iIndex,pVm,iType,pAddr");
             stream.Write(stream.NewLine);
@@ -302,7 +272,7 @@ namespace ConsoleApplication2.Reader
             }
         }
 
-        public bool ReadCsvs()
+        public override bool ReadCsvs()
         {
             DirectoryInfo d = new DirectoryInfo(@".\" + _basedir);
             FileInfo[] files;
@@ -321,7 +291,7 @@ namespace ConsoleApplication2.Reader
             return foundAChange;
         }
 
-        private bool ReadCsvFile(FileInfo fi)
+        protected bool ReadCsvFile(FileInfo fi)
         {
             Console.Out.WriteLine("Reading in CSV data from [" + fi.FullName + "]...");
             int end = fi.Name.LastIndexOf('-');
@@ -397,7 +367,7 @@ namespace ConsoleApplication2.Reader
             return foundAChange;
         }
 
-        private static List<string> GetCsvHeaders(string line)
+        protected static List<string> GetCsvHeaders(string line)
         {
             string[] temp = line.Split(',');
             List<string> headers = temp.ToList();

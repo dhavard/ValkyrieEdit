@@ -6,7 +6,7 @@ using System.IO;
 using ConsoleApplication2.Reader;
 using System.Text.RegularExpressions;
 
-namespace ConsoleApplication2.Data
+namespace ConsoleApplication2.Data.Mxe
 {
     public class MxeWord : ByteWord
     {
@@ -252,9 +252,14 @@ namespace ConsoleApplication2.Data
             }
         }
 
-        private int GetValueAsInt()
+        public int GetValueAsInt()
         {
             return BitConverter.ToInt32(GetBytes(), 0);
+        }
+
+        public int GetValueAsRawInt()
+        {
+            return BitConverter.ToInt32(GetRawBytes(), 0);
         }
 
         private void SetValueAsInt(string val)

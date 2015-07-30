@@ -14,9 +14,9 @@ namespace ConsoleApplication2
 
         public ByteWord(int position)
         {
-            _position = position;
-            _length = 4;
-            _bytes = new byte[_length];
+            Position = position;
+            Length = 4;
+            _bytes = new byte[Length];
         }
         
         protected virtual byte[] ResizeArrayIfNeeded(byte[] bytes)

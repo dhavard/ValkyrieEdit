@@ -8,8 +8,20 @@ namespace ConsoleApplication2
 {
     public class ByteString
     {
-        protected int _position;
-        protected int _length;
+        private int _position;
+
+        public int Position
+        {
+            get { return _position; }
+            set { _position = value; }
+        }
+        private int _length;
+
+        public int Length
+        {
+            get { return _length; }
+            set { _length = value; }
+        }
         protected byte[] _bytes;
 
         public ByteString()
@@ -22,16 +34,6 @@ namespace ConsoleApplication2
             _position = position;
             _length = length;
             _bytes = new byte[_length];
-        }
-
-        public int GetPosition()
-        {
-            return _position;
-        }
-
-        public int GetLength()
-        {
-            return _length;
         }
 
         public byte[] GetBytes()

@@ -5,7 +5,7 @@ using System.Text;
 using ConsoleApplication2.Reader;
 using System.IO;
 
-namespace ConsoleApplication2.Data
+namespace ConsoleApplication2.Data.Mxe
 {
     public class MxeBlockEntry
     {

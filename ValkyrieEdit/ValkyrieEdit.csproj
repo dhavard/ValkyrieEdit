@@ -69,14 +69,19 @@
     <Compile Include="ByteString.cs" />
     <Compile Include="ByteWord.cs" />
     <Compile Include="ByteLine.cs" />
-    <Compile Include="Data\MxeBlockEntry.cs" />
-    <Compile Include="Data\MxeEntryType.cs" />
-    <Compile Include="Data\MxeIndexEntry.cs" />
-    <Compile Include="Data\MxeWord.cs" />
+    <Compile Include="Data\Mtp\MtpIndexEntry.cs" />
+    <Compile Include="Data\Mtp\MtpSentence.cs" />
+    <Compile Include="Data\Mtp\MtpTimingEntry.cs" />
+    <Compile Include="Data\Mxe\MxeBlockEntry.cs" />
+    <Compile Include="Data\Mxe\MxeEntryType.cs" />
+    <Compile Include="Data\Mxe\MxeIndexEntry.cs" />
+    <Compile Include="Data\Mxe\MxeWord.cs" />
     <Compile Include="Discover\ConfigDiscovery.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reader\MtpParser.cs" />
     <Compile Include="Reader\MxeParser.cs" />
+    <Compile Include="Reader\Parser.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
