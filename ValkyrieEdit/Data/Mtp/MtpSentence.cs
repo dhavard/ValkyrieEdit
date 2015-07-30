@@ -36,8 +36,15 @@ namespace ValkyrieEdit.Data.Mtp
         {
             _size.ReadFromFile(stream);
 
-            _sentence = new ByteString(Size.Position + Size.Length, Size.GetValueAsRawInt());
-            _sentence.ReadFromFile(stream);
+            if (_size.GetValueAsRawInt() < 50000)
+            {
+                _sentence = new ByteString(Size.Position + Size.Length, Size.GetValueAsRawInt());
+                _sentence.ReadFromFile(stream);
+            }
+            else
+            {
+                Console.Out.WriteLine("Maximum sentence length [50000] exceeded.");
+            }
         }
 
         public void Write(FileStream stream, MtpSentence previous)

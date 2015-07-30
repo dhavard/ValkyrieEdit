@@ -69,11 +69,11 @@ namespace ValkyrieEdit.Reader
             _indexesStart = pos;
 
             MtpIndexEntry prevE = null;
-            for (int i = 0; i < sc; i++)
+            for (int i = 0; i < sc && i < 9; i++)
             {
                 MtpIndexEntry e = new MtpIndexEntry(pos, this, prevE);
                 e.ReadEntry(stream);
-                _indexes.Add((int)e.Id.GetValue(), e);
+                _indexes.Add(e.Id.GetValueAsRawInt(), e);
 
                 prevE = e;
                 pos += _sentenceCount.Length * 4;
