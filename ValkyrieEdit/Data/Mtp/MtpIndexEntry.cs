@@ -150,11 +150,15 @@ namespace ValkyrieEdit.Data.Mtp
 
         private void ReadTiming(FileStream mtpStream)
         {
-            List<FileInfo> esrCollection = new List<FileInfo>();
-            FindEsrFile(mtpStream, esrCollection);
+            if (_parser.EsrFiles == null)
+            {
+                List<FileInfo> esrCollection = new List<FileInfo>();
+                FindEsrFile(mtpStream, esrCollection);
+                _parser.EsrFiles = esrCollection;
+            }
 
             int matchLoc = -1;
-            matchLoc = FindTimingsIfExists(esrCollection, matchLoc);
+            matchLoc = FindTimingsIfExists(matchLoc);
         }
 
         private static void FindEsrFile(FileStream mtpStream, List<FileInfo> esrCollection)
@@ -165,42 +169,64 @@ namespace ValkyrieEdit.Data.Mtp
             {
                 FileInfo fi = new FileInfo(Path.GetFileName(mtpStream.Name));
                 DirectoryInfo mtpDir = new DirectoryInfo(Path.GetDirectoryName(mtpStream.Name));
-                DirectoryInfo esrDir = null;
-
-                foreach (DirectoryInfo di in mtpDir.Parent.GetDirectories(ESR_FOLDER_NAME))
-                {
-                    esrDir = di;
-                    break;
-                }
+                DirectoryInfo esrDir = new DirectoryInfo(Path.Combine(mtpDir.Parent.FullName, ESR_FOLDER_NAME)); 
 
                 string chapter = mc[0].Groups[1].Value;
-                foreach (FileInfo fil in esrDir.GetFiles(String.Format(ESR_NAME_FORMAT, chapter, ASTERICK)))
+                string search = String.Format(ESR_NAME_FORMAT, chapter, ASTERICK);
+
+                Console.Out.WriteLine(String.Format(@"Searching for timing values in esr files matching [{0}]", Path.Combine(esrDir.FullName, search)));
+
+                foreach (FileInfo fil in esrDir.GetFiles(search))
                 {
                     esrCollection.Add(fil);
                 }
             }
         }
 
-        private int FindTimingsIfExists(List<FileInfo> esrCollection, int matchLoc)
+        private int FindTimingsIfExists(int matchLoc)
         {
-            foreach (FileInfo fi in esrCollection)
+            if (_parser.PreferredEsrFile != null)
             {
-                try
+                matchLoc = SearchEsrForTiming(matchLoc, _parser.PreferredEsrFile);
+                if (matchLoc > -1)
                 {
-                    using (var esrStream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.None))
-                    {
-                        matchLoc = ReadForTiming(matchLoc, esrStream);
+                    return matchLoc;
+                }
+                else
+                {
+                    //don't look in this file again. Timing are grouped by ESR file, so if we found it here
+                    // before and not now then we are done with this one
+                    _parser.EsrFiles.Remove(_parser.PreferredEsrFile);
+                    _parser.PreferredEsrFile = null;
+                }
+            }
 
-                        if (matchLoc > -1)
-                        {
-                            break;
-                        }
-                    }
-                }
-                catch (Exception exc)
+            foreach (FileInfo fi in _parser.EsrFiles)
+            {
+                matchLoc = SearchEsrForTiming(matchLoc, fi);
+                if (matchLoc > -1)
                 {
-                    Console.Out.WriteLine(exc.ToString());
+                    //Note that this should only log the FIRST timing in that ESR file, all others should be found by "Preferred" block.
+                    Console.Out.WriteLine(String.Format(@"Found ESR timing at [{0}] in file [{1}]", matchLoc, fi.Name));
+                    _parser.PreferredEsrFile = fi;
+                    break;
                 }
+            }
+            return matchLoc;
+        }
+
+        private int SearchEsrForTiming(int matchLoc, FileInfo fi)
+        {
+            try
+            {
+                using (var esrStream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    matchLoc = ReadForTiming(matchLoc, esrStream);
+                }
+            }
+            catch (Exception exc)
+            {
+                Console.Out.WriteLine(exc.ToString());
             }
             return matchLoc;
         }

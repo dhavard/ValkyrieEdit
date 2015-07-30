@@ -83,10 +83,14 @@ namespace ValkyrieEdit.Reader
         private static void HandleDirectory(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
         {
             DirectoryInfo d = new DirectoryInfo(fn);
-            FileInfo[] files;
-            string search = "*.mxe";
-            files = d.GetFiles(search);
-            foreach (FileInfo fi in files)
+
+            SearchAndHandleFileOfType(isSync, isTest, writeHex, writeIndex, d, "*.mxe");
+            SearchAndHandleFileOfType(isSync, isTest, writeHex, writeIndex, d, "*.mtp");
+        }
+
+        private static void SearchAndHandleFileOfType(bool isSync, bool isTest, bool writeHex, bool writeIndex, DirectoryInfo d, string search)
+        {
+            foreach (FileInfo fi in d.GetFiles(search))
             {
                 HandleFile(fi.FullName, isSync, isTest, writeHex, writeIndex);
             }

@@ -41,6 +41,22 @@ namespace ValkyrieEdit.Reader
 
         protected Dictionary<int, MtpIndexEntry> _indexes;
 
+        private FileInfo _preferredEsrFile;
+
+        public FileInfo PreferredEsrFile
+        {
+            get { return _preferredEsrFile; }
+            set { _preferredEsrFile = value; }
+        }
+
+        private List<FileInfo> _esrFiles;
+
+        public List<FileInfo> EsrFiles
+        {
+            get { return _esrFiles; }
+            set { _esrFiles = value; }
+        }
+
         public MtpParser(String filename)
         {
             _indexes = new Dictionary<int, MtpIndexEntry>();
