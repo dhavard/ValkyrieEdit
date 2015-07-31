@@ -13,11 +13,9 @@ namespace ConsoleApplication2.Reader
     public class MxeParser : Parser
     {
         private const string CSV_OPEN_NAME_ERROR = @"Csv file [{0}] was not named in the expect manner (e.g. '4-VlMxMapObjectCommonInfo-Data.csv'). Skipping file.";
-        private const string CSV_MATCH_ERROR = @"Mxe Index referenced in file [{0}] of value [{1}] could not be found in source. Skipping record.";
         private const string CSV_MATCH_TITLE_ERROR = @"Mxe type mismatch referenced in file name [{0}] on line [{1}]. Expected [{2}] but found [{3}]. Skipping record.";
         private const string CSV_MATCH_SIZE_ERROR = @"Mxe size mismatch referenced in file name [{0}] on line [{1}]. Expected [{2}] but found [{3}]. Skipping record.";
         private const string CSV_MATCH_COUNT_ERROR = @"Mxe count mismatch referenced in file name [{0}] on line [{1}]. Expected [{2}] but found [{3}]. Skipping record.";
-        private const string CSV_PARSE_ERROR = @"Error parsing index of file [{0}] line [{1}]. Skipping record.";
         private const string ALL_INDEX_FORMAT = @"{0}\All-Indexes.csv";
         private const string CSV_FILE_FORMAT = @"{0}\{1}-{2}{3}";
         private const string CSV_ENDING = @"-Data.csv";
@@ -347,7 +345,7 @@ namespace ConsoleApplication2.Reader
                                 Console.Out.WriteLine(String.Format(CSV_MATCH_SIZE_ERROR, fi.FullName, lineNum, index.GetTypeCode(), count));
                                 continue;
                             }
-                            if (!index.GetTypeCode().Equals(count))
+                            if (!headers.Count.Equals(data.Count))
                             {
                                 Console.Out.WriteLine(String.Format(CSV_MATCH_COUNT_ERROR, fi.FullName, lineNum, headers.Count, data.Count));
                                 continue;

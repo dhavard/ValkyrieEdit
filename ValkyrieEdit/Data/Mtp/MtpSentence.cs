@@ -87,5 +87,35 @@ namespace ValkyrieEdit.Data.Mtp
         {
             stream.Write("sentence");
         }
+
+        public bool ReadCsvData(List<string> data)
+        {
+            bool ret = false;
+            if (data.Count < 1)
+            {
+                Console.Out.WriteLine("Insufficient sentence data count. Skipping record.");
+                return ret;
+            }
+
+            string newSentence = data[0].Replace("\\n", "\n").Replace("\\r", "\r").Replace("~", ",");
+            string sent = Encoding.UTF8.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length);
+            if (!sent.Equals(newSentence))
+            {
+                Console.Out.WriteLine(String.Format(@"Changing [{0}] original value [{1}] to new value [{2}]", "sentence", sent, newSentence));
+                byte[] bytes = Encoding.UTF8.GetBytes(newSentence);
+                _sentence.SetBytes(bytes);
+                _sentence.Length = bytes.Length;
+                _size.SetValue(_size.Header, String.Empty + bytes.Length, true);
+                ret = true;
+            }
+            TrimData(data);
+
+            return ret;
+        }
+
+        public static void TrimData(List<string> data)
+        {
+            data.RemoveRange(0, 1);
+        }
     }
 }

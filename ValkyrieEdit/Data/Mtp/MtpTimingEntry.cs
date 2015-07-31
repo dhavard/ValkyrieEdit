@@ -51,7 +51,7 @@ namespace ValkyrieEdit.Data.Mtp
         {
             _filename = fs.Name;
 
-            _id = new MxeWord(pos, "hId");
+            _id = new MxeWord(pos, "hTimingId");
             _frames = new MxeWord(pos, "hStartframeCountframes");
             _unknown1 = new MxeWord(pos, "hUnknown1");
             _unknown2 = new MxeWord(pos, "hUnknown2");
@@ -108,7 +108,42 @@ namespace ValkyrieEdit.Data.Mtp
 
         public static void WriteCsvHeaders(StreamWriter stream)
         {
-            stream.Write("filename,hId,hStartframeCountframes,hUnknown1,hUnknown2,");
+            stream.Write("filename,hTimingId,hStartframeCountframes,hUnknown1,hUnknown2,");
+        }
+
+        public bool ReadCsvData(List<string> data)
+        {
+            bool ret = false;
+            if (data.Count < 5)
+            {
+                Console.Out.WriteLine("Insufficient timing data count. Skipping record.");
+                return ret;
+            }
+
+            //ret = CompareAndSetFilename(data[0], ret); // filename should also be read only
+            //ret = _id.SetValue(_id.Header, data[1], true) || ret; // id should be read only
+            ret = _frames.SetValue(_frames.Header, data[2], true) || ret;
+            ret = _unknown1.SetValue(_unknown1.Header, data[3], true) || ret;
+            ret = _unknown2.SetValue(_unknown2.Header, data[4], true) || ret; 
+            TrimData(data);
+
+            return ret;
+        }
+
+        public static void TrimData(List<string> data)
+        {
+
+            data.RemoveRange(0, 5);
+        }
+
+        private bool CompareAndSetFilename(string fn, bool ret)
+        {
+            if (!_filename.Equals(fn))
+            {
+                _filename = fn;
+                ret = true;
+            }
+            return ret;
         }
     }
 }

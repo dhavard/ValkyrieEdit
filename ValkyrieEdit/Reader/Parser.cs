@@ -11,6 +11,8 @@ namespace ValkyrieEdit.Reader
 {
     public abstract class Parser
     {
+        protected const string CSV_MATCH_ERROR = @"Mxe Index referenced in file [{0}] of value [{1}] could not be found in source. Skipping record.";
+        protected const string CSV_PARSE_ERROR = @"Error parsing index of file [{0}] line [{1}]. Skipping record.";
         private const string MXE_END = ".mxe";
         private const string MTP_END = ".mtp";
 
@@ -144,7 +146,7 @@ namespace ValkyrieEdit.Reader
             Console.Out.WriteLine("Reading in CSV data...");
             if (parser.ReadCsvs() && isSync)
             {
-                Console.Out.WriteLine("Backup MXE file and then Writing out MXE data to [" + fn + "]...");
+                Console.Out.WriteLine("Backup Source file and then Writing out Source data to [" + fn + "]...");
 
                 // back up the mxe file with a .bak file
                 int fileCount = -1;

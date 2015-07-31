@@ -123,6 +123,41 @@ namespace ValkyrieEdit.Data.Mtp
             _sentence.Write(stream, _previous == null ? null : _previous.Sentence);
         }
 
+        public virtual bool ReadCsvLineData(List<string> data)
+        {
+            bool ret = false;
+            if (data.Count < 10)
+            {
+                Console.Out.WriteLine("Insufficient data count. Skipping record.");
+                return ret;
+            }
+
+            //ret = _id.SetValue(_id.Header, data[0], true) || ret; // id should be read only
+            ret = _actor.SetValue(_actor.Header, data[1], true) || ret;
+            //ret = _start.SetValue(_start.Header, data[2], true) || ret; // start should be read only
+            ret = _unknown.SetValue(_unknown.Header, data[3], true) || ret;
+            data.RemoveRange(0, 4);
+
+            if (_timing != null)
+            {
+                ret = _timing.ReadCsvData(data) || ret;
+            }
+            else
+            {
+                MtpTimingEntry.TrimData(data);
+            }
+            if (_sentence != null)
+            {
+                ret = _sentence.ReadCsvData(data) || ret;
+            }
+            else
+            {
+                MtpSentence.TrimData(data);
+            }
+
+            return ret;
+        }
+
         public void WriteCsv(StreamWriter stream)
         {
             _id.WriteCsv(stream);
