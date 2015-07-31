@@ -62,7 +62,10 @@ namespace ValkyrieEdit.Reader
             _indexes = new Dictionary<int, MtpIndexEntry>();
             _filename = filename;
             _basedir = @".\" + Path.GetFileNameWithoutExtension(_filename);
-            Directory.CreateDirectory(_basedir);
+            if (!Directory.Exists("./mtpa"))
+            {
+                Directory.CreateDirectory("./mtpa");
+            }
         }
 
         protected override void ReadTableMeta(FileStream stream)
@@ -154,7 +157,7 @@ namespace ValkyrieEdit.Reader
 
         public override void WriteCsv()
         {
-            string fn = _basedir + ".csv";
+            string fn = Path.Combine( "mtpa", _basedir + ".csv" );
             String msg = "Writing data file ";
             Console.Out.WriteLine(msg + fn);
             try
