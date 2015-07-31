@@ -19,10 +19,10 @@ namespace ValkyrieEdit.Data.Mtp
         private const string MTP_ESR_NAME_PATTERN = @"mtpa_adv_(\d+).mtp";
         private const string ADV_PART = @"mtpa_adv_";
 
-        private MtpParser _parser;
-        private MtpIndexEntry _previous;
+        protected MtpParser _parser;
+        protected MtpIndexEntry _previous;
 
-        private MtpTimingEntry _timing;
+        protected MtpTimingEntry _timing;
 
         public MtpTimingEntry Timing
         {
@@ -30,7 +30,7 @@ namespace ValkyrieEdit.Data.Mtp
             set { _timing = value; }
         }
 
-        private MtpSentence _sentence;
+        protected MtpSentence _sentence;
 
         public MtpSentence Sentence
         {
@@ -38,7 +38,7 @@ namespace ValkyrieEdit.Data.Mtp
             set { _sentence = value; }
         }
 
-        private int _position;
+        protected int _position;
 
         public int Position
         {
@@ -46,7 +46,7 @@ namespace ValkyrieEdit.Data.Mtp
             set { _position = value; }
         }
 
-        private MxeWord _id;
+        protected MxeWord _id;
 
         public MxeWord Id
         {
@@ -54,7 +54,7 @@ namespace ValkyrieEdit.Data.Mtp
             set { _id = value; }
         }
 
-        private MxeWord _actor;
+        protected MxeWord _actor;
 
         public MxeWord Actor
         {
@@ -62,7 +62,7 @@ namespace ValkyrieEdit.Data.Mtp
             set { _actor = value; }
         }
 
-        private MxeWord _start;
+        protected MxeWord _start;
 
         public MxeWord Start
         {
@@ -70,12 +70,17 @@ namespace ValkyrieEdit.Data.Mtp
             set { _start = value; }
         }
 
-        private MxeWord _unknown;
+        protected MxeWord _unknown;
 
         public MxeWord Unknown
         {
             get { return _unknown; }
             set { _unknown = value; }
+        }
+
+        protected MtpIndexEntry()
+        {
+
         }
 
         public MtpIndexEntry(int position, MtpParser parser, MtpIndexEntry prev)
@@ -148,7 +153,7 @@ namespace ValkyrieEdit.Data.Mtp
             MtpSentence.WriteCsvHeaders(stream);
         }
 
-        private void ReadTiming(FileStream mtpStream)
+        protected virtual void ReadTiming(FileStream mtpStream)
         {
             if (_parser.EsrFiles == null)
             {

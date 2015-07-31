@@ -69,6 +69,7 @@
     <Compile Include="ByteString.cs" />
     <Compile Include="ByteWord.cs" />
     <Compile Include="ByteLine.cs" />
+    <Compile Include="Data\Mtp\MtpIndexExtendedEntry.cs" />
     <Compile Include="Data\Mtp\MtpIndexEntry.cs" />
     <Compile Include="Data\Mtp\MtpSentence.cs" />
     <Compile Include="Data\Mtp\MtpTimingEntry.cs" />

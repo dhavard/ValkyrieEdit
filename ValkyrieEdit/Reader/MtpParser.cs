@@ -15,7 +15,7 @@ namespace ValkyrieEdit.Reader
         private const int _eofcOnePos = 0x04;
         private const int _eofcTwoPos = 0x14;
         private const int _sentenceCountPos = 0x24;
-        private const int _aCountPos = 0x28;
+        private const int _aCountPos = 0x28; //this is also the size of the index entries, need to account for that.
         private const int _bCountPos = 0x2C;
         private const int _aBlockPos = 0x30;
         private const int _sentenceIndexSize = 0x0F;
@@ -76,7 +76,7 @@ namespace ValkyrieEdit.Reader
             _bCount.ReadFromFile(stream);
 
             int sc = (int)_sentenceCount.GetValueAsRawInt();
-            int ac = (int)_aCount.GetValueAsRawInt();
+            int ac = (int)_aCount.GetValueAsRawInt(); // this is also the size of the index entries
             int bc = (int)_bCount.GetValueAsRawInt();
             int pos = _aBlockPos + _aCount.Length * ac + _bCount.Length * bc;
 
@@ -89,10 +89,14 @@ namespace ValkyrieEdit.Reader
             for (int i = 0; i < sc; i++)
             {
                 MtpIndexEntry e = new MtpIndexEntry(pos, this, prevE);
+                if (ac == 0x14)
+                {
+                    e = new MtpIndexExtendedEntry(pos, this, prevE);
+                }
                 entries.Add(e);
 
                 prevE = e;
-                pos += _sentenceCount.Length * 4;
+                pos += _sentenceCount.Length * ac;
             }
 
             _sentencesStart = pos;
