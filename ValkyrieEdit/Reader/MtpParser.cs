@@ -234,6 +234,10 @@ namespace ValkyrieEdit.Reader
                 int diff = index.Sentence.Size.GetValueAsRawInt() - previousSentenceLength;
                 if (diff != 0)
                 {
+                    if (diff % 4 != 0)
+                    {
+                        diff += 4 - diff % 4; // addresses are word aligned, so difference changes need to be word aligned as well.
+                    }
                     Console.Out.WriteLine(String.Format(@"Adjusting positions of other objects due to length change of [{0}]", d0));
                     _eofcOne.SetValue(_eofcOne.Header, String.Empty + (_eofcOne.GetValueAsRawInt() + diff), true);
                     _eofcTwo.SetValue(_eofcTwo.Header, String.Empty + (_eofcTwo.GetValueAsRawInt() + diff), true);

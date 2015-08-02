@@ -49,27 +49,10 @@ namespace ValkyrieEdit.Data.Mtp
 
         public void Write(FileStream stream, MtpSentence previous)
         {
-            //int withEndLen = Sentence.Length + 1;
-            //int needsToAdd = 4 - (withEndLen % 4 );
-            if (previous != null && previous.Sentence != null)
-            {
-                _size.Position = previous.Size.Position + _size.Length + previous.Sentence.Length;
-                _sentence.Position = _size.Position + _size.Length;
-            }
-
-            List<byte> bytes = _sentence.GetRawBytes().ToList();
-            for (int i = 0; i < 5 - (_sentence.Length + 1) % 4; i++)
-            {
-                bytes.Add((byte)0);
-            }
-
-            _size.SetValue("iSize", String.Empty + bytes.Count);
-            _sentence.Length = bytes.Count;
-            _sentence.SetBytes(bytes.ToArray());
-
             _size.WriteToFile(stream);
             if (_sentence != null)
             {
+                PadSentence();
                 _sentence.WriteToFile(stream);
             }
         }
@@ -103,14 +86,30 @@ namespace ValkyrieEdit.Data.Mtp
             {
                 Console.Out.WriteLine(String.Format(@"Changing [{0}] original value [{1}] to new value [{2}]", "sentence", sent, newSentence));
                 byte[] bytes = Encoding.UTF8.GetBytes(newSentence);
-                _sentence.SetBytes(bytes);
-                _sentence.Length = bytes.Length;
                 _size.SetValue(_size.Header, String.Empty + bytes.Length, true);
+                _sentence.SetBytes(bytes);
+                
                 ret = true;
             }
             TrimData(data);
 
             return ret;
+        }
+
+        public void PadSentence()
+        {
+            PadSentence(_sentence.GetRawBytes());
+        }
+
+        private void PadSentence(byte[] bytes)
+        {
+            List<byte> bytesl = bytes.ToList();
+            for (int i = 0; i < 4 - (bytes.Length % 4); i++)
+            {
+                bytesl.Add((byte)0);
+            }
+            _sentence.SetBytes(bytesl.ToArray());
+            _sentence.Length = bytesl.Count;
         }
 
         public static void TrimData(List<string> data)
