@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using ConsoleApplication2.Reader;
 
-namespace ConsoleApplication2.Data
+namespace ConsoleApplication2.Data.Mxe
 {
     public class MxeIndexEntry
     {

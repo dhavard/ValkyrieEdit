@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ConsoleApplication2.Reader;
-using ConsoleApplication2.Data;
+using ConsoleApplication2.Data.Mxe;
 using System.IO;
 using ValkyrieEdit.Discover;
+using ValkyrieEdit.Reader;
 
 namespace ConsoleApplication2
 {
@@ -86,7 +87,7 @@ namespace ConsoleApplication2
             {
                 FigureOutWhatFileToUse(ref fn, ref wasGivenFile);
 
-                HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
+                Parser.HandleFileOrMethod(fn, isSync, isTest, writeHex, writeIndex);
 
                 if (ConfigDiscovery.HasDiscoveries())
                 {
@@ -146,45 +147,6 @@ namespace ConsoleApplication2
             Console.Out.WriteLine(@"7. ^_^ Enjoy ^_^");
         }
 
-        private static void HandleFileOrMethod(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
-        {
-            FileAttributes attr = File.GetAttributes(fn);
-            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-            {
-                HandleDirectory(fn, isSync, isTest, writeHex, writeIndex);
-            }
-            else
-            {
-                HandleFile(fn, isSync, isTest, writeHex, writeIndex);
-            }
-        }
-
-        private static void HandleDirectory(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
-        {
-            DirectoryInfo d = new DirectoryInfo(fn);
-            FileInfo[] files;
-            string search = "*.mxe";
-            files = d.GetFiles(search);
-            foreach (FileInfo fi in files)
-            {
-                HandleFile(fi.FullName, isSync, isTest, writeHex, writeIndex);
-            }
-        }
-
-        private static void HandleFile(string fn, bool isSync, bool isTest, bool writeHex, bool writeIndex)
-        {
-            MxeParser parser = ReadMxe(fn);
-
-            if (!isTest)
-            {
-                DoMxeToCsv(writeHex, writeIndex, parser);
-            }
-            else
-            {
-                DoCsvToMxeSync(fn, isSync, parser);
-            }
-        }
-
         private static void FigureOutWhatFileToUse(ref string fn, ref bool wasGivenFile)
         {
             string filename = fn;
@@ -205,19 +167,9 @@ namespace ConsoleApplication2
             }
         }
 
-        private static MxeParser ReadMxe(string fn)
-        {
-            Console.Out.WriteLine("Using [" + fn + "] as source file.");
-            MxeParser parser = new MxeParser(fn);
-
-            Console.Out.WriteLine("Reading data...");
-            parser.Read();
-            return parser;
-        }
-
         private static string PromptForFile(string fn)
         {
-            Console.Out.WriteLine("Provide a path to the mxe file:");
+            Console.Out.WriteLine("Provide a path to the file:");
             Console.Out.WriteLine("Default value is [" + fn + "]");
             string inFn = Console.ReadLine();
 
@@ -228,46 +180,6 @@ namespace ConsoleApplication2
             return fn;
         }
 
-        private static void DoMxeToCsv(bool writeHex, bool writeIndex, MxeParser parser)
-        {
-            if (writeIndex)
-            {
-                Console.Out.WriteLine("Writing out Index data...");
-                parser.WriteIndexes();
-            }
-            Console.Out.WriteLine("Writing out CSV data...");
-            parser.WriteCsv();
-            if (writeHex)
-            {
-                Console.Out.WriteLine("Writing out Hex data...");
-                MxeWord.Hex = true;
-                parser.WriteCsv();
-                MxeWord.Hex = false;
-            }
-        }
-
-        private static void DoCsvToMxeSync(string fn, bool isSync, MxeParser parser)
-        {
-            //read in CSV and write to MXE if we found a change
-            Console.Out.WriteLine("Reading in CSV data...");
-            if (parser.ReadCsvs() && isSync)
-            {
-                Console.Out.WriteLine("Backup MXE file and then Writing out MXE data to [" + fn + "]...");
-                
-                // back up the mxe file with a .bak file
-                int fileCount = -1;
-                string backup = fn + ".bak";
-                do
-                {
-                    fileCount++;
-                }
-                while (File.Exists(backup + (fileCount > 0 ? fileCount.ToString() : String.Empty)));
-
-                File.Copy(fn, backup + (fileCount > 0 ? fileCount.ToString() : String.Empty));
-                // write out the changed data
-                parser.Write();
-            }
-        }
 
         private static string ReadTargetFile()
         {

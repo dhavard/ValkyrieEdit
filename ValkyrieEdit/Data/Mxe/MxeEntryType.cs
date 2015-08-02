@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using ValkyrieEdit.Discover;
 
-namespace ConsoleApplication2.Data
+namespace ConsoleApplication2.Data.Mxe
 {
     public class MxeEntryType
     {

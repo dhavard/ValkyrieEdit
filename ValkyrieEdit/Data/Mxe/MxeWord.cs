@@ -6,7 +6,7 @@ using System.IO;
 using ConsoleApplication2.Reader;
 using System.Text.RegularExpressions;
 
-namespace ConsoleApplication2.Data
+namespace ConsoleApplication2.Data.Mxe
 {
     public class MxeWord : ByteWord
     {
@@ -61,6 +61,14 @@ namespace ConsoleApplication2.Data
         {
             get { return _pstring; }
             set { _pstring = value; }
+        }
+
+        private bool _checkOriginal = true;
+
+        public bool CheckOriginal
+        {
+            get { return _checkOriginal; }
+            set { _checkOriginal = value; }
         }
 
         public MxeWord( int position, string header ) : base(position)
@@ -121,7 +129,18 @@ namespace ConsoleApplication2.Data
 
         public bool SetValue(string header, string val)
         {
-            if (!header.Equals(_header))
+            return SetValue(header, val, false);
+        }
+
+        public bool SetValue(string header, string val, bool reverse)
+        {
+            bool validateHeader = true;
+            if (header.StartsWith("z"))
+            {
+                header = header.Substring(1);
+                validateHeader = false;
+            }
+            if (validateHeader && !header.Equals(_header))
             {
                 Console.Out.WriteLine(String.Format(@"Non-matching header found. Expected [{0}] found [{1}]. Skipping value.", _header, header));
             }
@@ -138,14 +157,14 @@ namespace ConsoleApplication2.Data
                     switch ((int)header[0])
                     {
                         case (int)ValueType.Float:
-                            SetValueAsFloat(val);
+                            SetValueAsFloat(val, reverse);
                             break;
                         case (int)ValueType.Hex:
                         default:
                             SetValueAsHex(val);
                             break;
                         case (int)ValueType.Int:
-                            SetValueAsInt(val);
+                            SetValueAsInt(val, reverse);
                             break;
                         case (int)ValueType.OneByOne:
                             SetValueAsOnes(val);
@@ -176,7 +195,7 @@ namespace ConsoleApplication2.Data
                     }
                 }
                 
-                if (!original.Equals(newval))
+                if (_checkOriginal && !original.Equals(newval))
                 {
                     Console.Out.WriteLine(String.Format(@"Changing [{0}] original value [{1}] to new value [{2}]", _header, original, newval));
                     return true;
@@ -252,12 +271,17 @@ namespace ConsoleApplication2.Data
             }
         }
 
-        private int GetValueAsInt()
+        public int GetValueAsInt()
         {
             return BitConverter.ToInt32(GetBytes(), 0);
         }
 
-        private void SetValueAsInt(string val)
+        public int GetValueAsRawInt()
+        {
+            return BitConverter.ToInt32(GetRawBytes(), 0);
+        }
+
+        private void SetValueAsInt(string val, bool reverse)
         {
             int v;
             if (val.StartsWith("0x"))
@@ -268,7 +292,7 @@ namespace ConsoleApplication2.Data
             {
                 v = Int32.Parse(val);
             }
-            SetBytes(ResizeArrayIfNeeded(BitConverter.GetBytes(v)));
+            SetBytes(ResizeArrayIfNeeded(BitConverter.GetBytes(v), reverse));
         }
 
         private float GetValueAsFloat()
@@ -276,10 +300,10 @@ namespace ConsoleApplication2.Data
             return BitConverter.ToSingle(GetBytes(), 0);
         }
 
-        private void SetValueAsFloat(string val)
+        private void SetValueAsFloat(string val, bool reverse)
         {
             Single f = Single.Parse(val);
-            SetBytes(ResizeArrayIfNeeded(BitConverter.GetBytes(f)));
+            SetBytes(ResizeArrayIfNeeded(BitConverter.GetBytes(f), reverse));
         }
 
         private string GetValueAsHex()
@@ -289,7 +313,7 @@ namespace ConsoleApplication2.Data
 
         private void SetValueAsHex(string val)
         {
-            SetValueAsInt(val);
+            SetValueAsInt(val, false);
         }
 
         private string GetValueAsOnes()
@@ -299,7 +323,7 @@ namespace ConsoleApplication2.Data
 
         private void SetValueAsOnes(string val)
         {
-            SetValueAsInt(val.Replace("-", ""));
+            SetValueAsInt(val.Replace("-", ""), false);
         }
 
         private string GetValueAsBinary()
@@ -327,6 +351,15 @@ namespace ConsoleApplication2.Data
 
         protected override byte[] ResizeArrayIfNeeded(byte[] bytes)
         {
+            return ResizeArrayIfNeeded(bytes, false);
+        }
+
+        protected byte[] ResizeArrayIfNeeded(byte[] bytes, bool reverse)
+        {
+            if (reverse)
+            {
+                return base.ResizeArrayIfNeeded(bytes);
+            }
             return base.ResizeArrayIfNeeded(bytes).Reverse().ToArray();
         }
 
