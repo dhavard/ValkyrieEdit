@@ -10,6 +10,9 @@ namespace ValkyrieEdit.Data.Mtp
 {
     public class MtpSentence
     {
+        // The game appears to use Shift-JIS encoding internally and this allows Japanese text data to be read/written correctly
+        private static readonly Encoding SourceEncoding = Encoding.GetEncoding("shift_jis");
+
         private MxeWord _size;
 
         public MxeWord Size
@@ -61,7 +64,7 @@ namespace ValkyrieEdit.Data.Mtp
         {
             if (_sentence != null)
             {
-                string sent = Encoding.UTF8.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length);
+                string sent = SourceEncoding.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length);
                 stream.Write(sent.Replace("\n", "\\n").Replace("\r", "\\r").Replace(",", "~"));
             }
         }
@@ -81,11 +84,11 @@ namespace ValkyrieEdit.Data.Mtp
             }
 
             string newSentence = data[0].Replace("\\n", "\n").Replace("\\r", "\r").Replace("~", ",");
-            string sent = Encoding.UTF8.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length);
+            string sent = SourceEncoding.GetString(_sentence.GetRawBytes().ToArray(), 0, _sentence.Length);
             if (!sent.Equals(newSentence))
             {
                 Console.Out.WriteLine(String.Format(@"Changing [{0}] original value [{1}] to new value [{2}]", "sentence", sent, newSentence));
-                byte[] bytes = Encoding.UTF8.GetBytes(newSentence);
+                byte[] bytes = SourceEncoding.GetBytes(newSentence);
                 _size.SetValue(_size.Header, String.Empty + bytes.Length, true);
                 _sentence.SetBytes(bytes);
                 

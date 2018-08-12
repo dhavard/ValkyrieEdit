@@ -10,6 +10,9 @@ namespace ConsoleApplication2.Data.Mxe
 {
     public class MxeWord : ByteWord
     {
+        // The game appears to use Shift-JIS encoding internally and this allows Japanese text data to be read/written correctly
+        private static readonly Encoding SourceEncoding = Encoding.GetEncoding("shift_jis");
+
         private static bool _verbose = true;
 
         public static bool Verbose
@@ -115,7 +118,7 @@ namespace ConsoleApplication2.Data.Mxe
                         b = (byte)str.ReadByte();
                         pos++;
                     }
-                    ret = Encoding.UTF8.GetString(pbytes.ToArray(), 0, pbytes.Count);
+                    ret = SourceEncoding.GetString(pbytes.ToArray(), 0, pbytes.Count);
                 }
             }
 
@@ -254,8 +257,8 @@ namespace ConsoleApplication2.Data.Mxe
 
             if (!val.Equals(_pstring))
             {
-                byte[] newstr = System.Text.Encoding.UTF8.GetBytes(val);
-                byte[] oldstr = System.Text.Encoding.UTF8.GetBytes(pstring);
+                byte[] newstr = SourceEncoding.GetBytes(val);
+                byte[] oldstr = SourceEncoding.GetBytes(pstring);
 
                 if (newstr.Length == oldstr.Length)
                 {
