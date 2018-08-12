@@ -203,7 +203,7 @@ namespace ValkyrieEdit.Data.Mtp
 
         private static void FindEsrFile(FileStream mtpStream, List<FileInfo> esrCollection)
         {
-            Regex r = new Regex(MTP_ESR_NAME_PATTERN);
+            Regex r = new Regex(MTP_ESR_NAME_PATTERN, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
             MatchCollection mc = r.Matches(mtpStream.Name);
             if (mc.Count > 0 && mc[0].Groups.Count > 1)
             {

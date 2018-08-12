@@ -23,11 +23,11 @@ namespace ValkyrieEdit.Reader
 
         public static Parser GetParser(string fn)
         {
-            if (fn.EndsWith(MXE_END))
+            if (fn.EndsWith(MXE_END, StringComparison.OrdinalIgnoreCase))
             {
                 return new MxeParser(fn);
             }
-            else if (fn.EndsWith(MTP_END))
+            else if (fn.EndsWith(MTP_END, StringComparison.OrdinalIgnoreCase))
             {
                 return new MtpParser(fn);
             }
